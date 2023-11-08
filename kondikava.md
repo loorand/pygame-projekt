@@ -1,4 +1,5 @@
 End goal puudub, teoorias läheb lõputult edasi
+
 Aeg annab skoori
 
 Kui puutud kokku õluga += väsimus
