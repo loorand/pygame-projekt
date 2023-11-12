@@ -30,8 +30,10 @@ TÄHTEDE KOGUMINE - Suvalise aja tagant tekib täht, mida saab koguda, nt tähte
 SKOOR - Peale kindlat aega saad nt 10 võrra skoori juurde  
 ENERGIA MEHAANIKA - Kogu aeg energia väheneb, pead koguma juurde seda  
 
-
-
 ![projekt3](https://github.com/loorand/pygame-projekt/assets/146488878/6ae97cc6-96bd-4ee7-9efb-67f995ce27a3)
+
 ![projekt2](https://github.com/loorand/pygame-projekt/assets/146488878/7c77a667-9107-4b5b-bc15-1d8d7364598a)
+
 ![projekt](https://github.com/loorand/pygame-projekt/assets/146488878/75874b4b-4917-4f75-b2f7-d41fec5d71e7)
+
+![movement](https://github.com/loorand/pygame-projekt/assets/145984471/b855c0ec-3431-4928-a8d9-d1d2cd7fe9c2)
