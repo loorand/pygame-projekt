@@ -25,10 +25,10 @@ Alfaks vähemalt see väsimuse bar
 
 Mäng läheb ajaga aina raskemaks, nt iga minut läheb tase kõrgemaks
 
-TAKISTUSED - Mäng läbi/ lükkavad mängijat tagasi/ mängija läheb läbi, aga võtab "dämmi" v energiat
-TÄHTEDE KOGUMINE - Suvalise aja tagant tekib täht, mida saab koguda, nt tähtedega saad osta kiirust või energiat vms
-SKOOR - Peale kindlat aega saad nt 10 võrra skoori juurde
-ENERGIA MEHAANIKA - Kogu aeg energia väheneb, pead koguma juurde seda
+TAKISTUSED - Mäng läbi/ lükkavad mängijat tagasi/ mängija läheb läbi, aga võtab "dämmi" v energiat  
+TÄHTEDE KOGUMINE - Suvalise aja tagant tekib täht, mida saab koguda, nt tähtedega saad osta kiirust või energiat vms  
+SKOOR - Peale kindlat aega saad nt 10 võrra skoori juurde  
+ENERGIA MEHAANIKA - Kogu aeg energia väheneb, pead koguma juurde seda  
 
 
 
