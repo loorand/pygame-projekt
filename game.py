@@ -22,6 +22,7 @@ font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 50)
 bg_surface = pygame.image.load("graphics/background.png").convert_alpha()
 
 score = 1000
+speed = 6
 
 square_surface = pygame.image.load("graphics/square.png").convert_alpha()
 square_rect = square_surface.get_rect(midleft = (random.randint(0, 1000), random.randint(25, 975)))
@@ -49,10 +50,10 @@ while True:
 
     if game:   
         # movement
-        player_speed = 12
+        player_speed = 2 * speed
         keys = pygame.key.get_pressed()
         if keys[pygame.K_f]:
-            player_speed = 6
+            player_speed = speed
         if keys[pygame.K_UP]:
             player_rect.y -= player_speed
         if keys[pygame.K_DOWN]:
@@ -67,13 +68,13 @@ while True:
         scores()
         
         # square positioning
-        square_rect.x -= 5
+        square_rect.x -= speed
         if square_rect.right <= 0:
             square_rect.left = 1000
             square_rect.y = random.randint(25, 975)
 
         # heal positioning
-        heal_rect.x -= 5
+        heal_rect.x -= speed
         if heal_rect.right <= -2000:
             heal_rect.left = 1000
             heal_rect.y = random.randint(25, 975)
