@@ -58,7 +58,7 @@ while True:
 
     if game:
         # player movement
-        player_speed = 12
+        player_speed = 2 * speed
         keys = pygame.key.get_pressed()
         if keys[pygame.K_f]:
             player_speed = speed
@@ -76,12 +76,18 @@ while True:
         scores()
         
         # square positioning
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_f]:
+            square_rect.x -= speed / 2
         square_rect.x -= speed
         if square_rect.right <= 0:
             square_rect.left = 1000
             square_rect.y = random.randint(25, 975)
 
         # heal positioning
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_f]:
+            heal_rect.x -= speed / 2
         heal_rect.x -= speed
         if heal_rect.right <= -2000:
             heal_rect.left = 1000
