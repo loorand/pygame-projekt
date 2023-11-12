@@ -16,7 +16,7 @@ def scores():
 
 # pygame initialisation and display config (size, used fonts)
 pygame.init()
-screen = pygame.display.set_mode((1000,1000))
+screen = pygame.display.set_mode((1280,720)) # 16:9
 pygame.display.set_caption("Fly Game")
 clock = pygame.time.Clock()
 font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 50)
@@ -24,6 +24,7 @@ font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 50)
 # background surface
 bg_surface = pygame.image.load("graphics/background.png").convert_alpha()
 
+# arguments
 score = 1000
 speed = 6
 

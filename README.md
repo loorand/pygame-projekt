@@ -1,7 +1,7 @@
 # pygame-projekt
 
 ## Sisu
-**<Mängu nimi>** on 2D Pygame'i mäng, mis paneb proovile sinu refleksid ja nutikuse. **Mängus** tuleb mööda põigelda laastavatest takistustest, et aidata <nimel> jõuda <sihtkohta>. Hea õnne ja/või oskuse korral võid tee peal leida erinevaid boonuseid, mis aitavad sul jõuda kaugemale!
+**<Mängu nimi>** on 2D Pygame'i mäng, mis paneb proovile sinu refleksid ja nutikuse. **Mängus** tuleb mööda põigelda laastavatest takistustest, et aidata tegelasel? sihtkohta?. Hea õnne ja/või oskuse korral võid tee peal leida erinevaid boonuseid, mis aitavad sul jõuda kaugemale!
 
 ## Sammud
 * **Planning**
