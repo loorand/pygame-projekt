@@ -6,17 +6,23 @@ from sys import exit
 def scores():
     global score
     # collision
-    if player_rect.colliderect(square_rect):
-        score -= 50
-    if player_rect.colliderect(heal_rect):
-        score += 5
-    score_surface = font.render(f"Hea mäng {score}", True, "#111111").convert_alpha()
-    score_rect = score_surface.get_rect(center = (500,69))
+    #if player_rect.colliderect(barrel_rect):
+    #    score -= 50
+    if player_rect.colliderect(duck_rect):
+        score -= 1
+    if player_rect.colliderect(energy_rect):
+        energy_rect.bottom = -500
+        energy_rect.x = random.randint(25, 417)
+        score += 100
+    score -= 1
+    # HETKEL LOEB SKOORI VEEL VANAMOODI e MITTE AJA JÄRGI
+    score_surface = font.render(f"Fishies: {score}", True, "#111111").convert_alpha()
+    score_rect = score_surface.get_rect(center = (216,50))
     screen.blit(score_surface, score_rect)
 
 # pygame initialisation and display config (size, used fonts)
 pygame.init()
-screen = pygame.display.set_mode((1280,720)) # 16:9
+screen = pygame.display.set_mode((432,768)) # 9:16
 pygame.display.set_caption("Swimming with the Fishies")
 clock = pygame.time.Clock()
 font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 50)
@@ -25,20 +31,27 @@ font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 50)
 bg_surface = pygame.image.load("graphics/background.png").convert_alpha()
 
 # arguments
-score = 1000
-speed = 6
+score = 10000
+speed = 5
 
-# square surface / spawn location
-square_surface = pygame.image.load("graphics/square.png").convert_alpha()
-square_rect = square_surface.get_rect(midleft = (random.randint(0, 1000), random.randint(25, 975)))
+# barrel surface / spawn location
+barrel_surface = pygame.image.load("graphics/barrel.png").convert_alpha()
+barrel_rect = barrel_surface.get_rect(center = (random.randint(32,400), random.randint(-500,-200)))
 
-# healer surface / spawn location
-heal_surface = pygame.image.load("graphics/heal.png").convert_alpha()
-heal_rect = heal_surface.get_rect(midleft = (random.randint(1000, 5000), random.randint(25, 975)))
+# duck surface / spawn location
+duck_surface = pygame.image.load("graphics/duck.png").convert_alpha()
+duck_rect = duck_surface.get_rect(center = (random.randint(25,417), random.randint(-1000,-500)))
+
+# energy surface / spawn location
+energy_surface = pygame.image.load("graphics/energy.png").convert_alpha()
+energy_rect = duck_surface.get_rect(center = (random.randint(25,417), random.randint(-1500,-500)))
 
 # player surface / spawn location
 player_surface = pygame.image.load("graphics/player.png").convert_alpha()
-player_rect = player_surface.get_rect(center = (500,500))
+player_rect = player_surface.get_rect(center = (216,384))
+
+# rotations
+player_surface_down = pygame.transform.rotate(player_surface, 180)
 
 game = True
 # main loop
@@ -52,65 +65,69 @@ while True:
         if not game:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 game = True
-                score = 1000
-                square_rect = square_surface.get_rect(midleft = (random.randint(0, 1000), random.randint(25, 975)))
-                heal_rect = heal_surface.get_rect(midleft = (random.randint(1000, 5000), random.randint(25, 975)))
-                player_rect = player_surface.get_rect(center = (500,500))
+                score = 10000
+                barrel_rect = barrel_surface.get_rect(center = (random.randint(32,400), random.randint(-500,-200)))
+                duck_rect = duck_surface.get_rect(center = (random.randint(25,417), random.randint(-1000,-500)))
+                player_rect = player_surface.get_rect(center = (216,284))
 
     if game:
         # player movement
         player_speed = 2 * speed
+        if player_rect.colliderect(duck_rect):
+            player_speed *= 0.5
         keys = pygame.key.get_pressed()
         if keys[pygame.K_f]:
             player_speed = speed
         if keys[pygame.K_UP]:
             player_rect.y -= player_speed
         if keys[pygame.K_DOWN]:
-            player_rect.y += player_speed
+            player_rect.y += player_speed * 0.5
+            player_surface = player_surface_down
         if keys[pygame.K_LEFT]:
-            player_rect.x -= player_speed
+            player_rect.x -= player_speed * 0.8
         if keys[pygame.K_RIGHT]:
-            player_rect.x += player_speed
+            player_rect.x += player_speed * 0.8
 
         # background & text/score function
         screen.blit(bg_surface,(0,0))
         scores()
 
-        # square positioning
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_f]:
-            square_rect.x -= speed / 2
-        square_rect.x -= speed
-        if square_rect.right <= 0:
-            square_rect.left = 1000
-            square_rect.y = random.randint(25, 975)
+        # barrel positioning
+        barrel_rect.y += speed
+        if barrel_rect.top >= 768:
+            barrel_rect.bottom = random.randint(-250,-200)
+            barrel_rect.x = random.randint(32, 400)
 
-        # heal positioning
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_f]:
-            heal_rect.x -= speed / 2
-        heal_rect.x -= speed
-        if heal_rect.right <= -2000:
-            heal_rect.left = 1000
-            heal_rect.y = random.randint(25, 975)
+        # duck positioning
+        duck_rect.y += speed
+        if duck_rect.top >= 768:
+            duck_rect.bottom = random.randint(-400,-350)
+            duck_rect.x = random.randint(25, 417)
+
+        # energy positioning
+        energy_rect.y += speed * 0.9
+        if energy_rect.top >= 768:
+            energy_rect.bottom = -500
+            energy_rect.x = random.randint(25, 417)
 
         # collision
-        #if player_rect.colliderect(square_rect):
-        #    player_rect.right = square_rect.left
+        if player_rect.colliderect(barrel_rect):
+            player_rect.top = barrel_rect.bottom
         
         # player positioning
-        if player_rect.right <= 20:
-            player_rect.right = 20
-        if player_rect.left >= 980:
-            player_rect.left = 980
-        if player_rect.top >= 980:
-            player_rect.top = 980
-        if player_rect.bottom <= 20:
-            player_rect.bottom = 20
+        if player_rect.right <= 50:
+            player_rect.right = 50
+        if player_rect.left >= 382:
+            player_rect.left = 382
+        if player_rect.top >= 768:
+            game = False
+        if player_rect.bottom <= 130:
+            player_rect.bottom = 130
 
-        # square & player blit
-        screen.blit(square_surface,square_rect)
-        screen.blit(heal_surface,heal_rect)
+        # barrel & player blit
+        screen.blit(barrel_surface,barrel_rect)
+        screen.blit(duck_surface,duck_rect)
+        screen.blit(energy_surface,energy_rect)
         screen.blit(player_surface,player_rect)
 
         # game over
