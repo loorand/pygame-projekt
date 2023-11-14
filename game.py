@@ -140,4 +140,4 @@ while True:
     # internal clock
     pygame.display.update()
     clock.tick(60)
-#Palun tööta lihtsalt
+#Palun tööta lihtsalt, vist töötas nüüd=====
