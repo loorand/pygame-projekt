@@ -20,6 +20,13 @@ def scores():
     score_rect = score_surface.get_rect(center = (216,50))
     screen.blit(score_surface, score_rect)
 
+def player_animation():
+    global player_surface, player_index
+    player_index += 0.06
+    if player_index >= len(player_anim):
+        player_index = 0
+    player_surface = player_anim[int(player_index)]
+
 # pygame initialisation and display config (size, used fonts)
 pygame.init()
 screen = pygame.display.set_mode((432,768)) # 9:16
@@ -47,11 +54,18 @@ energy_surface = pygame.image.load("graphics/energy.png").convert_alpha()
 energy_rect = duck_surface.get_rect(center = (random.randint(25,417), random.randint(-1500,-500)))
 
 # player surface / spawn location
-player_surface = pygame.image.load("graphics/player.png").convert_alpha()
+player_surface_1 = pygame.image.load("graphics/player_1.png").convert_alpha()
+player_surface_2 = pygame.image.load("graphics/player_2.png").convert_alpha()
+player_anim = [player_surface_1,player_surface_2]
+player_index = 0
+player_surface = player_anim[player_index]
 player_rect = player_surface.get_rect(center = (216,384))
 
 # rotations
+player_surface_up = player_surface
 player_surface_down = pygame.transform.rotate(player_surface, 180)
+player_surface_left = pygame.transform.rotate(player_surface, 10)
+player_surface_right = pygame.transform.rotate(player_surface, 350)
 
 game = True
 # main loop
@@ -80,17 +94,22 @@ while True:
             player_speed = speed
         if keys[pygame.K_UP]:
             player_rect.y -= player_speed
+            player_surface = player_surface_up
         if keys[pygame.K_DOWN]:
             player_rect.y += player_speed * 0.5
             player_surface = player_surface_down
         if keys[pygame.K_LEFT]:
             player_rect.x -= player_speed * 0.8
+            player_surface = player_surface_left
         if keys[pygame.K_RIGHT]:
             player_rect.x += player_speed * 0.8
+            player_surface = player_surface_right
 
         # background & text/score function
         screen.blit(bg_surface,(0,0))
         scores()
+
+        player_animation()
 
         # barrel positioning
         barrel_rect.y += speed
