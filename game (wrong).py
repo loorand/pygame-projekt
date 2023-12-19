@@ -120,7 +120,7 @@ while True:
     if game:
         # player movement
         player_speed = 2.1 * speed
-        if Player.rect.colliderect(Duck.rect()):
+        if Player.__init__.rect.colliderect(Duck.rect()):
             player_speed *= 0.44
         keys = pygame.key.get_pressed()
         if keys[pygame.K_f]:
