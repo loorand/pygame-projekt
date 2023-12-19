@@ -5,20 +5,25 @@ from sys import exit
 # function to change and display score during gameplay
 def scores():
     global score
+    global energy_collect
     # collision
-    #if player_rect.colliderect(barrel_rect):
-    #    score -= 50
+    """ if player_rect.colliderect(barrel_rect):
+        score -= 50 """
     if player_rect.colliderect(duck_rect):
         score -= 1
     if player_rect.colliderect(energy_rect):
-        energy_rect.bottom = -500
+        energy_rect.bottom = random.randint(-280,-220)
         energy_rect.x = random.randint(25, 417)
+        energy_collect += 1
         score += 100
     score -= 1
     # HETKEL LOEB SKOORI VEEL VANAMOODI e MITTE AJA JÄRGI
-    score_surface = font.render(f"Fishies: {score}", True, "#111111").convert_alpha()
+    score_surface = font.render(f"Energy: {score}", True, "#111111").convert_alpha()
     score_rect = score_surface.get_rect(center = (216,50))
     screen.blit(score_surface, score_rect)
+    """ energy_col_surface = font.render(f"Fishies: {energy_collect}", True, "#111111").convert_alpha()
+    energy_col_rect = energy_col_surface.get_rect(center = (216,100))
+    screen.blit(energy_col_surface, energy_col_rect) """
 
 def player_animation():
     global player_surface, player_index
@@ -37,19 +42,20 @@ font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 50)
 # background surface
 bg_surface = pygame.image.load("graphics/background.png").convert_alpha()
 
-# arguments
-score = 10000
+# starting arguments
+score = 1000
 speed = 5
+""" energy_collect = 0 """
 
-# barrel surface / spawn location
+# barrel (obstacle) surface / spawn location
 barrel_surface = pygame.image.load("graphics/barrel.png").convert_alpha()
 barrel_rect = barrel_surface.get_rect(center = (random.randint(32,400), random.randint(-500,-200)))
 
-# duck surface / spawn location
+# duck (slowdown) surface / spawn location
 duck_surface = pygame.image.load("graphics/duck.png").convert_alpha()
 duck_rect = duck_surface.get_rect(center = (random.randint(25,417), random.randint(-1000,-500)))
 
-# energy surface / spawn location
+# energy (points) surface / spawn location
 energy_surface = pygame.image.load("graphics/energy.png").convert_alpha()
 energy_rect = duck_surface.get_rect(center = (random.randint(25,417), random.randint(-1500,-500)))
 
@@ -62,10 +68,10 @@ player_surface = player_anim[player_index]
 player_rect = player_surface.get_rect(center = (216,384))
 
 # rotations
-player_surface_up = player_surface
+""" player_surface_up = player_surface
 player_surface_down = pygame.transform.rotate(player_surface, 180)
 player_surface_left = pygame.transform.rotate(player_surface, 10)
-player_surface_right = pygame.transform.rotate(player_surface, 350)
+player_surface_right = pygame.transform.rotate(player_surface, 350) """
 
 game = True
 # main loop
@@ -79,31 +85,38 @@ while True:
         if not game:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 game = True
-                score = 10000
+                score = 1000
+                speed = 5
+                energy_collect = 0
                 barrel_rect = barrel_surface.get_rect(center = (random.randint(32,400), random.randint(-500,-200)))
                 duck_rect = duck_surface.get_rect(center = (random.randint(25,417), random.randint(-1000,-500)))
                 player_rect = player_surface.get_rect(center = (216,284))
 
     if game:
         # player movement
-        player_speed = 2 * speed
+        player_speed = 2.1 * speed
         if player_rect.colliderect(duck_rect):
-            player_speed *= 0.5
+            player_speed *= 0.44
         keys = pygame.key.get_pressed()
         if keys[pygame.K_f]:
             player_speed = speed
         if keys[pygame.K_UP]:
             player_rect.y -= player_speed
-            player_surface = player_surface_up
+            """ player_surface = player_surface_up """
         if keys[pygame.K_DOWN]:
-            player_rect.y += player_speed * 0.5
-            player_surface = player_surface_down
+            player_rect.y += player_speed * 0.56
+            """ player_surface = player_surface_down """
         if keys[pygame.K_LEFT]:
             player_rect.x -= player_speed * 0.8
-            player_surface = player_surface_left
+            """ player_surface = player_surface_left """
         if keys[pygame.K_RIGHT]:
             player_rect.x += player_speed * 0.8
-            player_surface = player_surface_right
+            """ player_surface = player_surface_right """
+
+        
+        
+        """ if energy_collect % 12 == 10:
+            speed *= 1.1 """
 
         # background & text/score function
         screen.blit(bg_surface,(0,0))
