@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, pickle
 from sys import exit
 
 # function to change and display score during gameplay
@@ -53,6 +53,12 @@ def player_animation():
     if keys[pygame.K_RIGHT]:
         player_surface = player_surface_right
 
+def draw_text(text, font, color, screen, y):
+    textobj = font.render(text, 1, color)
+    textrect = textobj.get_rect()
+    textrect.center = (screen_x // 2, y)
+    screen.blit(textobj, textrect)
+
 # pygame initialisation and display config (size, used fonts)
 pygame.init()
 screen = pygame.display.set_mode((432, 768)) # 9:16
@@ -66,6 +72,9 @@ bg_surface = pygame.image.load("graphics/background.png").convert_alpha()
 
 # starting arguments
 score = 1000
+with open("highscore.db", "r") as file:
+    highscore = int(file.read())
+    file.close()
 speed = 7
 energy_collect = 0
 gravity = 0
@@ -98,34 +107,32 @@ player_surface_up = player_surface
 player_surface_left = pygame.transform.rotate(player_surface, 10)
 player_surface_right = pygame.transform.rotate(player_surface, 350)
 
-def draw_text(text, font, color ,surface, x, y):
-    textobj = font.render(text, 1, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
-
 game = False
 # main loop
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            with open("highscore.db", "r+") as file:
+                if int(file.read()) < highscore:
+                    file.seek(0)
+                    file.write(str(highscore))
+                    file.truncate()
+                file.close()
             pygame.quit()
             exit()
 
         # game restart screen (S to restart)
         if not game:
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                mx, my = pygame.mouse.get_pos()
-                if nupp1.collidepoint((mx, my)):
-                    game = True
-                    score = 1000
-                    speed = 5
-                    energy_collect = 0
-                    gravity = 0
-                    barrel_rect = barrel_surface.get_rect(center = (random.randint(barrel_x, screen_x - barrel_x), random.randint(-20,-10) * 10))
-                    duck_rect = duck_surface.get_rect(center = (random.randint(duck_x, screen_x - duck_x), random.randint(-40,-20) * 10))
-                    energy_rect = duck_surface.get_rect(center = (random.randint(energy_x, screen_x - energy_x), random.randint(-30,-15) * 10))
-                    player_rect = player_surface.get_rect(center = (216,250))
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                game = True
+                score = 1000
+                speed = 5
+                energy_collect = 0
+                gravity = 0
+                barrel_rect = barrel_surface.get_rect(center = (random.randint(barrel_x, screen_x - barrel_x), random.randint(-20,-10) * 10))
+                duck_rect = duck_surface.get_rect(center = (random.randint(duck_x, screen_x - duck_x), random.randint(-40,-20) * 10))
+                energy_rect = duck_surface.get_rect(center = (random.randint(energy_x, screen_x - energy_x), random.randint(-30,-15) * 10))
+                player_rect = player_surface.get_rect(center = (216,250))
 
     if game:
         # player movement
@@ -134,15 +141,15 @@ while True:
             player_speed *= 0.3
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            player_rect.x -= player_speed * 0.7
+            player_rect.x -= player_speed * 0.6
         if keys[pygame.K_RIGHT]:
-            player_rect.x += player_speed * 0.7
+            player_rect.x += player_speed * 0.6
         if event.type == pygame.KEYDOWN and gravity >= 2:
             if event.key == pygame.K_UP:
                 gravity = -9
 
         # game maker-harder
-        speed = 7 + energy_collect / 10
+        speed = 7 + energy_collect / 8
         # magic
         screen.blit(bg_surface,(0,0))
         scores()
@@ -180,6 +187,8 @@ while True:
             player_rect.left = 382
         if player_rect.top >= 768:
             game = False
+            if energy_collect > highscore:
+                highscore = energy_collect
         if player_rect.bottom <= 84:
             player_rect.bottom = 84
 
@@ -191,20 +200,22 @@ while True:
         # game over
         if score <= 0:
             game = False
+            if energy_collect > highscore:
+                highscore = energy_collect
+        """ if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            game = False """
 
     else:
         screen.blit(bg_surface,(0,0))
-        draw_text("Main Menu", font, (255, 255, 255), screen, 20, 20)
-        nupp1 = pygame.Rect(50, 100, 200, 50)
-        nupp2 = pygame.Rect(50, 200, 200, 50)
-
-        pygame.draw.rect(screen, (255, 0, 0), nupp1)
-        """ pygame.draw.rect(screen, (255, 0, 0), nupp2) """
-
-        """ if nupp2.collidepoint((mx, my)):
-            game = True """
+        draw_text("Moving About", font, "#111111", screen, 40)
+        draw_text("PLAY (space)", font, "#111111", screen, 160)
+        draw_text("MOVE (arrows)", font, "#111111", screen, 200)
+        draw_text("SOUND (s)", font, "#111111", screen, 240)
+        if highscore > 0:
+            draw_text(f"HIGH SCORE: {highscore}", font, "#111111", screen, 320)
 
     # internal clock
     pygame.display.update()
-    print(game)
+    print(energy_collect)
+    print(highscore)
     clock.tick(60)
