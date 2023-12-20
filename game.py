@@ -63,11 +63,11 @@ energy_collect = 0
 gravity = 0
 
 # barrel (obstacle) surface / spawn location
-barrel_surface = pygame.image.load("graphics/barrel.png").convert_alpha()
+barrel_surface = pygame.image.load("graphics/batuut.png").convert_alpha()
 barrel_rect = barrel_surface.get_rect(center = (random.randint(32,400), random.randint(-20,-10) * 10))
 
 # duck (slowdown) surface / spawn location
-duck_surface = pygame.image.load("graphics/duck.png").convert_alpha()
+duck_surface = pygame.image.load("graphics/meteoriit.png").convert_alpha()
 duck_rect = duck_surface.get_rect(center = (random.randint(25,417), random.randint(-40,-20) * 10))
 
 # energy (points) surface / spawn location

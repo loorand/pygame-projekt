@@ -1,9 +1,5 @@
 import pygame, random, pickle
 from sys import exit
-from pygame import mixer
-
-
-
 
 # function to change and display score during gameplay
 def scores():
@@ -12,7 +8,7 @@ def scores():
     global gravity
     if player_rect.colliderect(duck_rect):
         score -= 1
-        player_rect.y += 4
+        player_rect.y += 5
     if player_rect.top <= 0:
         player_rect.top = 0
         score -= 50
@@ -61,9 +57,23 @@ def draw_text(text, font, color, screen, y):
     textrect.center = (screen_x // 2, y)
     screen.blit(textobj, textrect)
 
+def menu_music():
+    pygame.mixer.music.stop()
+    pygame.mixer.music.unload()
+    pygame.mixer.music.load("audio/horology.mp3")
+    pygame.mixer.music.set_volume(.7)
+    pygame.mixer.music.play(-1, 0, 150)
+
+def game_music():
+    pygame.mixer.music.stop()
+    pygame.mixer.music.unload()
+    pygame.mixer.music.load("audio/deserted_dunes_welcome_weary_feet.mp3")
+    pygame.mixer.music.set_volume(.7)
+    pygame.mixer.music.play(-1, 0, 50)
+
 # pygame initialisation and display config (size, used fonts)
-mixer.init()
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((432, 768)) # 9:16
 screen_x = screen.get_width()
 pygame.display.set_caption("Moving About")
@@ -80,10 +90,12 @@ bg1_rect = bg_surface.get_rect(bottomleft = (0, 0))
 score = 1000
 with open("highscore.db", "r") as file:
     highscore = int(file.read())
+    dif = 0
     file.close()
 speed = 7
 energy_collect = 0
 gravity = 0
+volume = 1
 
 # barrel surface / spawn location
 barrel_surface = pygame.image.load("graphics/barrel.png").convert_alpha()
@@ -111,32 +123,40 @@ player_rect = player_surface.get_rect(center = (216,250))
 # rotations
 player_surface_up = player_surface
 player_surface_left = pygame.transform.rotate(player_surface, 10)
-player_surface_right = pygame.transform.rotate(player_surface, 350)
-jump = mixer.Sound("jump.mp3")
-jump.set_volume(0.7)
+player_surface_right = pygame.transform.rotate(player_surface_2, 350)
 
 game = False
+sound = "MUTE"
+menu_music()
 # main loop
 while True:
-   
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             with open("highscore.db", "r+") as file:
-                if int(file.read()) < highscore:
+                if int(file.read()) < (highscore + dif):
                     file.seek(0)
-                    file.write(str(highscore))
+                    file.write(str(highscore - dif))
                     file.truncate()
                 file.close()
             pygame.quit()
             exit()
 
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+            print("test")
+            if volume == 1:
+                volume = 0
+                pygame.mixer.music.set_volume(0)
+                sound = "SOUND"
+            else:
+                volume = 1
+                pygame.mixer.music.set_volume(.7)
+                sound = "MUTE"
+
         # game restart screen (S to restart)
         if not game:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                mixer.music.load("robot_stop.mp3")
-                mixer.music.set_volume(1)
-                mixer.music.play()
                 game = True
+                game_music()
                 score = 1000
                 speed = 5
                 energy_collect = 0
@@ -145,15 +165,10 @@ while True:
                 duck_rect = duck_surface.get_rect(center = (random.randint(duck_x, screen_x - duck_x), random.randint(-40,-20) * 10))
                 energy_rect = duck_surface.get_rect(center = (random.randint(energy_x, screen_x - energy_x), random.randint(-30,-15) * 10))
                 player_rect = player_surface.get_rect(center = (216,250))
-   
 
     if game:
-        jump = mixer.Sound("jump.mp3")
-        jump.set_volume(0.7)
-        
-        
-        
-        
+        jump = pygame.mixer.Sound("audio/jump.mp3")
+        jump.set_volume(.7)
         # player movement
         player_speed = 9
         if player_rect.colliderect(duck_rect):
@@ -165,8 +180,8 @@ while True:
             player_rect.x += player_speed * 0.6
         if event.type == pygame.KEYDOWN and gravity >= 2:
             if event.key == pygame.K_UP:
-                mixer.Sound.play(jump)
                 gravity = -9
+                pygame.mixer.Sound.play(jump)
 
         # game maker-harder
         speed = 7 + energy_collect / 8
@@ -205,9 +220,10 @@ while True:
             energy_rect.left = random.randint(energy_surface.get_width(), screen.get_width() - energy_surface.get_width())
             energy_rect.y += random.randint(-1, 1)
         # collision ver 2
-        if event.type == pygame.KEYDOWN and player_rect.colliderect(barrel_rect):
-            if event.key == pygame.K_UP and gravity < 0:
-                gravity = -13
+        if gravity > 1 and player_rect.colliderect(barrel_rect):
+            """ if event.key == pygame.K_UP and event.type == pygame.KEYDOWN: """
+            gravity = -13
+            pygame.mixer.Sound.play(jump)
         # player is boxed in! but will DIE if they fall
         if player_rect.right <= 50:
             player_rect.right = 50
@@ -215,7 +231,9 @@ while True:
             player_rect.left = 382
         if player_rect.top >= 768:
             game = False
-            if energy_collect > highscore:
+            menu_music()
+            if energy_collect > (highscore - dif):
+                dif = 0
                 highscore = energy_collect
         if player_rect.bottom <= 84:
             player_rect.bottom = 84
@@ -225,15 +243,13 @@ while True:
         screen.blit(duck_surface, duck_rect)
         screen.blit(energy_surface, energy_rect)
         screen.blit(player_surface, player_rect)
-        
         # game over
         if score <= 0:
-            mixer.music.stop()
             game = False
-            if energy_collect > highscore:
+            menu_music()
+            if energy_collect > (highscore - dif):
+                dif = 0
                 highscore = energy_collect
-        """ if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            game = False """
 
     else:
         screen.blit(bg_surface, bg_rect)
@@ -241,13 +257,12 @@ while True:
         draw_text("Moving About", font, "#bbbbbb", screen, 40)
         draw_text("PLAY (space)", font, "#bbbbbb", screen, 160)
         draw_text("MOVE (arrows)", font, "#bbbbbb", screen, 200)
-        draw_text("SOUND (s)", font, "#bbbbbb", screen, 240)
-        if highscore > 0:
-            draw_text(f"HIGH SCORE: {highscore}", font, "#bbbbbb", screen, 320)
-
-    
-    
+        draw_text(f"{sound} (s)", font, "#bbbbbb", screen, 240)
+        draw_text(f"HIGH SCORE: {highscore - dif}", font, "#bbbbbb", screen, 320)
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_DELETE and highscore - dif > 0:
+            dif += 1
 
     # internal clock
     pygame.display.update()
+    print(energy_collect, highscore, dif, highscore + dif, highscore - dif)
     clock.tick(60)
