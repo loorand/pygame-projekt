@@ -220,9 +220,10 @@ while True:
             energy_rect.left = random.randint(energy_surface.get_width(), screen.get_width() - energy_surface.get_width())
             energy_rect.y += random.randint(-1, 1)
         # collision ver 2
-        if gravity > 0 and player_rect.colliderect(barrel_rect):
+        if gravity > 1 and player_rect.colliderect(barrel_rect):
             """ if event.key == pygame.K_UP and event.type == pygame.KEYDOWN: """
             gravity = -13
+            pygame.mixer.Sound.play(jump)
         # player is boxed in! but will DIE if they fall
         if player_rect.right <= 50:
             player_rect.right = 50
@@ -231,7 +232,8 @@ while True:
         if player_rect.top >= 768:
             game = False
             menu_music()
-            if energy_collect > highscore:
+            if energy_collect > (highscore - dif):
+                dif = 0
                 highscore = energy_collect
         if player_rect.bottom <= 84:
             player_rect.bottom = 84
@@ -245,7 +247,8 @@ while True:
         if score <= 0:
             game = False
             menu_music()
-            if energy_collect > highscore:
+            if energy_collect > (highscore - dif):
+                dif = 0
                 highscore = energy_collect
 
     else:
@@ -261,5 +264,5 @@ while True:
 
     # internal clock
     pygame.display.update()
-    print(highscore, dif, highscore + dif, highscore - dif)
+    print(energy_collect, highscore, dif, highscore + dif, highscore - dif)
     clock.tick(60)
