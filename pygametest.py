@@ -1,5 +1,7 @@
-import pygame, random
+import pygame, random, pickle
 from sys import exit
+from pygame import mixer
+
 
 
 
@@ -9,9 +11,10 @@ def scores():
     global energy_collect
     global gravity
     if player_rect.colliderect(duck_rect):
-        score -= 10
+        score -= 1
         player_rect.y += 4
-    if player_rect.top == 0:
+    if player_rect.top <= 0:
+        player_rect.top = 0
         score -= 50
         gravity = -gravity
     if player_rect.colliderect(energy_rect):
@@ -22,24 +25,22 @@ def scores():
 
     score -= 1
 
-    # EGG
     y = 0
-    if player_rect.top < 80:
-        y = player_rect.top - 80 - (80 - player_rect.top) * .5
+    if player_rect.top < 100:
+        y = player_rect.top - 100 - (80 - player_rect.top) * .5
 
-    score_surface = font.render(f"Stamina: {(score // 10)}", True, "#111111").convert_alpha()
-    score_rect = score_surface.get_rect(center = (216, y + 40))
+    score_surface = font.render(f"Stamina: {(score // 10)}", True, "#bbbbbb").convert_alpha()
+    score_rect = score_surface.get_rect(center = (216, y + 30))
     screen.blit(score_surface, score_rect)
-    energy_col_surface = font.render(f"Purples: {energy_collect}", True, "#111111").convert_alpha()
-    energy_col_rect = energy_col_surface.get_rect(center = (216, y + 80))
+    energy_col_surface = font.render(f"Purples: {energy_collect}", True, "#bbbbbb").convert_alpha()
+    energy_col_rect = energy_col_surface.get_rect(center = (216, y + 70))
     screen.blit(energy_col_surface, energy_col_rect)
 
-    # EGG
-    score2_surface = font.render(f"Stamina: {(score // 10)}", True, "#111111").convert_alpha()
-    score2_rect = score2_surface.get_rect(center = (216, y + 40 + 768))
+    score2_surface = font.render(f"Stamina: {(score // 10)}", True, "#bbbbbb").convert_alpha()
+    score2_rect = score2_surface.get_rect(center = (216, y + 30 + screen.get_height()))
     screen.blit(score2_surface, score2_rect)
-    energy2_col_surface = font.render(f"Purples: {energy_collect}", True, "#111111").convert_alpha()
-    energy2_col_rect = energy2_col_surface.get_rect(center = (216, y + 80 + 768))
+    energy2_col_surface = font.render(f"Purples: {energy_collect}", True, "#bbbbbb").convert_alpha()
+    energy2_col_rect = energy2_col_surface.get_rect(center = (216, y + 70 + screen.get_height()))
     screen.blit(energy2_col_surface, energy2_col_rect)
 
 def player_animation():
@@ -54,35 +55,52 @@ def player_animation():
     if keys[pygame.K_RIGHT]:
         player_surface = player_surface_right
 
+def draw_text(text, font, color, screen, y):
+    textobj = font.render(text, 1, color)
+    textrect = textobj.get_rect()
+    textrect.center = (screen_x // 2, y)
+    screen.blit(textobj, textrect)
+
 # pygame initialisation and display config (size, used fonts)
+mixer.init()
 pygame.init()
 screen = pygame.display.set_mode((432, 768)) # 9:16
+screen_x = screen.get_width()
 pygame.display.set_caption("Moving About")
 clock = pygame.time.Clock()
 font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 36)
 
 # background surface
 bg_surface = pygame.image.load("graphics/background.png").convert_alpha()
+bg_rect = bg_surface.get_rect(topleft = (0, 0))
+bg1_surface = pygame.image.load("graphics/background.png").convert_alpha()
+bg1_rect = bg_surface.get_rect(bottomleft = (0, 0))
 
 # starting arguments
 score = 1000
+with open("highscore.db", "r") as file:
+    highscore = int(file.read())
+    file.close()
 speed = 7
 energy_collect = 0
 gravity = 0
 
 # barrel surface / spawn location
-barrel_surface = pygame.image.load("graphics/speed.png").convert_alpha()
+barrel_surface = pygame.image.load("graphics/barrel.png").convert_alpha()
 barrel_surface.set_alpha(200)
-barrel_rect = barrel_surface.get_rect(center = (random.randint(32,400), random.randint(-20,-10) * 10))
+barrel_x = barrel_surface.get_width() // 2
+barrel_rect = barrel_surface.get_rect(center = (random.randint(barrel_x, screen_x - barrel_x), random.randint(-20,-10) * 10))
 # duck surface / spawn location
-duck_surface = pygame.image.load("graphics/dumbbell.png").convert_alpha()
+duck_surface = pygame.image.load("graphics/duck.png").convert_alpha()
 duck_surface.set_alpha(200)
-duck_rect = duck_surface.get_rect(center = (random.randint(25,407), random.randint(-40,-20) * 10))
+duck_x = duck_surface.get_width() // 2
+duck_rect = duck_surface.get_rect(center = (random.randint(duck_x, screen_x - duck_x), random.randint(-40,-20) * 10))
 # energy surface / spawn location
-energy_surface = pygame.image.load("graphics/redbull.png").convert_alpha()
+energy_surface = pygame.image.load("graphics/energy.png").convert_alpha()
 energy_surface.set_alpha(200)
-energy_rect = duck_surface.get_rect(center = (random.randint(25,407), random.randint(-30,-15) * 10))
-# player surface / spawn location
+energy_x = energy_surface.get_width() // 2
+energy_rect = duck_surface.get_rect(center = (random.randint(energy_x, screen_x - energy_x), random.randint(-30,-15) * 10))
+# player surface / spawn location / animation
 player_surface_1 = pygame.image.load("graphics/player_1.png").convert_alpha()
 player_surface_2 = pygame.image.load("graphics/player_2.png").convert_alpha()
 player_anim = [player_surface_1,player_surface_2]
@@ -94,70 +112,97 @@ player_rect = player_surface.get_rect(center = (216,250))
 player_surface_up = player_surface
 player_surface_left = pygame.transform.rotate(player_surface, 10)
 player_surface_right = pygame.transform.rotate(player_surface, 350)
+jump = mixer.Sound("jump.mp3")
+jump.set_volume(0.7)
 
-game = True
+game = False
 # main loop
 while True:
+   
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            with open("highscore.db", "r+") as file:
+                if int(file.read()) < highscore:
+                    file.seek(0)
+                    file.write(str(highscore))
+                    file.truncate()
+                file.close()
             pygame.quit()
             exit()
 
         # game restart screen (S to restart)
         if not game:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                mixer.music.load("robot_stop.mp3")
+                mixer.music.set_volume(1)
+                mixer.music.play()
                 game = True
                 score = 1000
                 speed = 5
                 energy_collect = 0
                 gravity = 0
-                barrel_rect = barrel_surface.get_rect(center = (random.randint(32, 400), random.randint(-20, -10) * 10))
-                duck_rect = duck_surface.get_rect(center = (random.randint(25, 417), random.randint(-40, -20) * 10))
-                energy_rect = duck_surface.get_rect(center = (random.randint(25, 417), random.randint(-30, -15) * 10))
+                barrel_rect = barrel_surface.get_rect(center = (random.randint(barrel_x, screen_x - barrel_x), random.randint(-20,-10) * 10))
+                duck_rect = duck_surface.get_rect(center = (random.randint(duck_x, screen_x - duck_x), random.randint(-40,-20) * 10))
+                energy_rect = duck_surface.get_rect(center = (random.randint(energy_x, screen_x - energy_x), random.randint(-30,-15) * 10))
                 player_rect = player_surface.get_rect(center = (216,250))
+   
 
     if game:
+        jump = mixer.Sound("jump.mp3")
+        jump.set_volume(0.7)
+        
+        
+        
+        
         # player movement
         player_speed = 9
         if player_rect.colliderect(duck_rect):
             player_speed *= 0.3
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_f]:
-            player_speed = speed
         if keys[pygame.K_LEFT]:
-            player_rect.x -= player_speed * 0.7
+            player_rect.x -= player_speed * 0.6
         if keys[pygame.K_RIGHT]:
-            player_rect.x += player_speed * 0.7
+            player_rect.x += player_speed * 0.6
         if event.type == pygame.KEYDOWN and gravity >= 2:
             if event.key == pygame.K_UP:
+                mixer.Sound.play(jump)
                 gravity = -9
 
         # game maker-harder
-        speed = 7 + energy_collect / 16
-        screen.blit(bg_surface,(0,0))
+        speed = 7 + energy_collect / 8
+        # magic
+        screen.blit(bg_surface, bg_rect)
+        screen.blit(bg1_surface, bg1_rect)
         scores()
         player_animation()
 
         # imitating some sort of gravity
         gravity += .5
         player_rect.y += gravity
+        # background positioning
+        bg_rect.y += speed / 14 + 0.3 / speed
+        if bg_rect.top >= screen.get_height():
+            bg_rect.bottom = 0
+        bg1_rect.y += speed / 14 + 0.3 / speed
+        if bg1_rect.top >= screen.get_height():
+            bg1_rect.bottom = 0
         # barrel positioning
         barrel_rect.y += speed
         if barrel_rect.top >= screen.get_height():
             barrel_rect.bottom = random.randint(-20, -10) * 10
-            barrel_rect.x = random.randint(barrel_surface.get_width() // 2, screen.get_width() - barrel_surface.get_width() // 2)
+            barrel_rect.left = random.randint(barrel_surface.get_width(), screen.get_width() - barrel_surface.get_width())
             barrel_rect.y += random.randint(-1, 1) # this nudges object falling speed slightly up/down
         # duck positioning
         duck_rect.y += speed
         if duck_rect.top >= screen.get_height():
             duck_rect.bottom = random.randint(-40, -20) * 10
-            duck_rect.x = random.randint(duck_surface.get_width() // 2, screen.get_width() - duck_surface.get_width() // 2)
+            duck_rect.left = random.randint(duck_surface.get_width(), screen.get_width() - duck_surface.get_width())
             duck_rect.y += random.randint(-1, 1)
         # energy positioning
         energy_rect.y += speed * 0.9
         if energy_rect.top >= screen.get_height():
             energy_rect.bottom = random.randint(-30, -15) * 10
-            energy_rect.x = random.randint(energy_surface.get_width() // 2, screen.get_width() - energy_surface.get_width() // 2)
+            energy_rect.left = random.randint(energy_surface.get_width(), screen.get_width() - energy_surface.get_width())
             energy_rect.y += random.randint(-1, 1)
         # collision ver 2
         if event.type == pygame.KEYDOWN and player_rect.colliderect(barrel_rect):
@@ -170,21 +215,38 @@ while True:
             player_rect.left = 382
         if player_rect.top >= 768:
             game = False
+            if energy_collect > highscore:
+                highscore = energy_collect
         if player_rect.bottom <= 84:
             player_rect.bottom = 84
 
         # BLITskrieg
+        screen.blit(barrel_surface, barrel_rect)
+        screen.blit(duck_surface, duck_rect)
+        screen.blit(energy_surface, energy_rect)
+        screen.blit(player_surface, player_rect)
         
-        screen.blit(barrel_surface,barrel_rect)
-        screen.blit(duck_surface,duck_rect)
-        screen.blit(energy_surface,energy_rect)
-        screen.blit(player_surface,player_rect)
         # game over
         if score <= 0:
+            mixer.music.stop()
             game = False
+            if energy_collect > highscore:
+                highscore = energy_collect
+        """ if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            game = False """
 
     else:
-        screen.fill("#111111")
+        screen.blit(bg_surface, bg_rect)
+        screen.blit(bg1_surface, bg1_rect)
+        draw_text("Moving About", font, "#bbbbbb", screen, 40)
+        draw_text("PLAY (space)", font, "#bbbbbb", screen, 160)
+        draw_text("MOVE (arrows)", font, "#bbbbbb", screen, 200)
+        draw_text("SOUND (s)", font, "#bbbbbb", screen, 240)
+        if highscore > 0:
+            draw_text(f"HIGH SCORE: {highscore}", font, "#bbbbbb", screen, 320)
+
+    
+    
 
     # internal clock
     pygame.display.update()

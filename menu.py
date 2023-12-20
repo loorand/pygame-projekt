@@ -7,6 +7,39 @@ screen = pygame.display.set_mode((500, 500),0,32) # 9:16
 pygame.display.set_caption("Moving About")
 clock = pygame.time.Clock()
 font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 36)
+
+score = 1000
+speed = 7
+energy_collect = 0
+gravity = 0
+
+
+
+
+# barrel surface / spawn location
+barrel_surface = pygame.image.load("graphics/speed.png").convert_alpha()
+barrel_surface.set_alpha(200)
+barrel_rect = barrel_surface.get_rect(center = (random.randint(32,400), random.randint(-20,-10) * 10))
+# duck surface / spawn location
+duck_surface = pygame.image.load("graphics/dumbbell.png").convert_alpha()
+duck_surface.set_alpha(200)
+duck_rect = duck_surface.get_rect(center = (random.randint(25,407), random.randint(-40,-20) * 10))
+# energy surface / spawn location
+energy_surface = pygame.image.load("graphics/redbull.png").convert_alpha()
+energy_surface.set_alpha(200)
+energy_rect = duck_surface.get_rect(center = (random.randint(25,407), random.randint(-30,-15) * 10))
+# player surface / spawn location
+player_surface_1 = pygame.image.load("graphics/player_1.png").convert_alpha()
+player_surface_2 = pygame.image.load("graphics/player_2.png").convert_alpha()
+player_anim = [player_surface_1,player_surface_2]
+player_index = 0
+player_surface = player_anim[player_index]
+player_rect = player_surface.get_rect(center = (216,250))
+
+# rotations
+player_surface_up = player_surface
+player_surface_left = pygame.transform.rotate(player_surface, 10)
+player_surface_right = pygame.transform.rotate(player_surface, 350)
 def scores():
     global score
     global energy_collect
@@ -78,6 +111,7 @@ def draw_text(text, font, color ,surface, x, y):
 
 def options():
     running = True
+    
     while running:
         draw_text("OPTIONS", font, (255, 255, 255) ,screen, 20, 20)
         
@@ -107,11 +141,13 @@ def main_menu():
         nupp2 = pygame.Rect(50, 200, 200, 50)
         if nupp1.collidepoint((mx, my)):
             if click:
+                screen.fill((0,0,0))
                 game()
         
         if nupp2.collidepoint((mx, my)):
             if click:
-                game()
+                screen.fill((0,0,0))
+                options()
             
 
 
@@ -144,6 +180,8 @@ def game():
     speed = 7
     energy_collect = 0
     gravity = 0
+    
+    
 
 
 
@@ -171,6 +209,7 @@ def game():
     player_surface_up = player_surface
     player_surface_left = pygame.transform.rotate(player_surface, 10)
     player_surface_right = pygame.transform.rotate(player_surface, 350)
+    
         
     
         
