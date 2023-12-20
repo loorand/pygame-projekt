@@ -56,6 +56,7 @@ def player_animation():
 # pygame initialisation and display config (size, used fonts)
 pygame.init()
 screen = pygame.display.set_mode((432, 768)) # 9:16
+screen_x = screen.get_width()
 pygame.display.set_caption("Moving About")
 clock = pygame.time.Clock()
 font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 36)
@@ -72,16 +73,19 @@ gravity = 0
 # barrel surface / spawn location
 barrel_surface = pygame.image.load("graphics/barrel.png").convert_alpha()
 barrel_surface.set_alpha(200)
-barrel_rect = barrel_surface.get_rect(center = (random.randint(32,400), random.randint(-20,-10) * 10))
+barrel_x = barrel_surface.get_width() // 2
+barrel_rect = barrel_surface.get_rect(center = (random.randint(barrel_x, screen_x - barrel_x), random.randint(-20,-10) * 10))
 # duck surface / spawn location
 duck_surface = pygame.image.load("graphics/duck.png").convert_alpha()
 duck_surface.set_alpha(200)
-duck_rect = duck_surface.get_rect(center = (random.randint(25,407), random.randint(-40,-20) * 10))
+duck_x = duck_surface.get_width() // 2
+duck_rect = duck_surface.get_rect(center = (random.randint(duck_x, screen_x - duck_x), random.randint(-40,-20) * 10))
 # energy surface / spawn location
 energy_surface = pygame.image.load("graphics/energy.png").convert_alpha()
 energy_surface.set_alpha(200)
-energy_rect = duck_surface.get_rect(center = (random.randint(25,407), random.randint(-30,-15) * 10))
-# player surface / spawn location
+energy_x = energy_surface.get_width() // 2
+energy_rect = duck_surface.get_rect(center = (random.randint(energy_x, screen_x - energy_x), random.randint(-30,-15) * 10))
+# player surface / spawn location / animation
 player_surface_1 = pygame.image.load("graphics/player_1.png").convert_alpha()
 player_surface_2 = pygame.image.load("graphics/player_2.png").convert_alpha()
 player_anim = [player_surface_1,player_surface_2]
@@ -94,7 +98,13 @@ player_surface_up = player_surface
 player_surface_left = pygame.transform.rotate(player_surface, 10)
 player_surface_right = pygame.transform.rotate(player_surface, 350)
 
-game = True
+def draw_text(text, font, color ,surface, x, y):
+    textobj = font.render(text, 1, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    surface.blit(textobj, textrect)
+
+game = False
 # main loop
 while True:
     for event in pygame.event.get():
@@ -104,16 +114,18 @@ while True:
 
         # game restart screen (S to restart)
         if not game:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-                game = True
-                score = 1000
-                speed = 5
-                energy_collect = 0
-                gravity = 0
-                barrel_rect = barrel_surface.get_rect(center = (random.randint(32, 400), random.randint(-20, -10) * 10))
-                duck_rect = duck_surface.get_rect(center = (random.randint(25, 417), random.randint(-40, -20) * 10))
-                energy_rect = duck_surface.get_rect(center = (random.randint(25, 417), random.randint(-30, -15) * 10))
-                player_rect = player_surface.get_rect(center = (216,250))
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mx, my = pygame.mouse.get_pos()
+                if nupp1.collidepoint((mx, my)):
+                    game = True
+                    score = 1000
+                    speed = 5
+                    energy_collect = 0
+                    gravity = 0
+                    barrel_rect = barrel_surface.get_rect(center = (random.randint(barrel_x, screen_x - barrel_x), random.randint(-20,-10) * 10))
+                    duck_rect = duck_surface.get_rect(center = (random.randint(duck_x, screen_x - duck_x), random.randint(-40,-20) * 10))
+                    energy_rect = duck_surface.get_rect(center = (random.randint(energy_x, screen_x - energy_x), random.randint(-30,-15) * 10))
+                    player_rect = player_surface.get_rect(center = (216,250))
 
     if game:
         # player movement
@@ -131,6 +143,7 @@ while True:
 
         # game maker-harder
         speed = 7 + energy_collect / 10
+        # magic
         screen.blit(bg_surface,(0,0))
         scores()
         player_animation()
@@ -180,8 +193,18 @@ while True:
             game = False
 
     else:
-        screen.fill("#111111")
+        screen.blit(bg_surface,(0,0))
+        draw_text("Main Menu", font, (255, 255, 255), screen, 20, 20)
+        nupp1 = pygame.Rect(50, 100, 200, 50)
+        nupp2 = pygame.Rect(50, 200, 200, 50)
+
+        pygame.draw.rect(screen, (255, 0, 0), nupp1)
+        """ pygame.draw.rect(screen, (255, 0, 0), nupp2) """
+
+        """ if nupp2.collidepoint((mx, my)):
+            game = True """
 
     # internal clock
     pygame.display.update()
+    print(game)
     clock.tick(60)
