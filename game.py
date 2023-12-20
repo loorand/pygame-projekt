@@ -21,23 +21,21 @@ def scores():
 
     score -= 1
 
-    # EGG
     y = 0
     if player_rect.top < 100:
         y = player_rect.top - 100 - (80 - player_rect.top) * .5
 
-    score_surface = font.render(f"Stamina: {(score // 10)}", True, "#111111").convert_alpha()
+    score_surface = font.render(f"Stamina: {(score // 10)}", True, "#bbbbbb").convert_alpha()
     score_rect = score_surface.get_rect(center = (216, y + 30))
     screen.blit(score_surface, score_rect)
-    energy_col_surface = font.render(f"Purples: {energy_collect}", True, "#111111").convert_alpha()
+    energy_col_surface = font.render(f"Purples: {energy_collect}", True, "#bbbbbb").convert_alpha()
     energy_col_rect = energy_col_surface.get_rect(center = (216, y + 70))
     screen.blit(energy_col_surface, energy_col_rect)
 
-    # EGG
-    score2_surface = font.render(f"Stamina: {(score // 10)}", True, "#111111").convert_alpha()
+    score2_surface = font.render(f"Stamina: {(score // 10)}", True, "#bbbbbb").convert_alpha()
     score2_rect = score2_surface.get_rect(center = (216, y + 30 + screen.get_height()))
     screen.blit(score2_surface, score2_rect)
-    energy2_col_surface = font.render(f"Purples: {energy_collect}", True, "#111111").convert_alpha()
+    energy2_col_surface = font.render(f"Purples: {energy_collect}", True, "#bbbbbb").convert_alpha()
     energy2_col_rect = energy2_col_surface.get_rect(center = (216, y + 70 + screen.get_height()))
     screen.blit(energy2_col_surface, energy2_col_rect)
 
@@ -69,6 +67,9 @@ font = pygame.font.Font("fonts/RobotoMono-Semibold.ttf", 36)
 
 # background surface
 bg_surface = pygame.image.load("graphics/background.png").convert_alpha()
+bg_rect = bg_surface.get_rect(topleft = (0, 0))
+bg1_surface = pygame.image.load("graphics/background.png").convert_alpha()
+bg1_rect = bg_surface.get_rect(bottomleft = (0, 0))
 
 # starting arguments
 score = 1000
@@ -151,13 +152,21 @@ while True:
         # game maker-harder
         speed = 7 + energy_collect / 8
         # magic
-        screen.blit(bg_surface,(0,0))
+        screen.blit(bg_surface, bg_rect)
+        screen.blit(bg1_surface, bg1_rect)
         scores()
         player_animation()
 
         # imitating some sort of gravity
         gravity += .5
         player_rect.y += gravity
+        # background positioning
+        bg_rect.y += speed / 14 + 0.3 / speed
+        if bg_rect.top >= screen.get_height():
+            bg_rect.bottom = 0
+        bg1_rect.y += speed / 14 + 0.3 / speed
+        if bg1_rect.top >= screen.get_height():
+            bg1_rect.bottom = 0
         # barrel positioning
         barrel_rect.y += speed
         if barrel_rect.top >= screen.get_height():
@@ -193,10 +202,10 @@ while True:
             player_rect.bottom = 84
 
         # BLITskrieg
-        screen.blit(barrel_surface,barrel_rect)
-        screen.blit(duck_surface,duck_rect)
-        screen.blit(energy_surface,energy_rect)
-        screen.blit(player_surface,player_rect)
+        screen.blit(barrel_surface, barrel_rect)
+        screen.blit(duck_surface, duck_rect)
+        screen.blit(energy_surface, energy_rect)
+        screen.blit(player_surface, player_rect)
         # game over
         if score <= 0:
             game = False
@@ -206,16 +215,15 @@ while True:
             game = False """
 
     else:
-        screen.blit(bg_surface,(0,0))
-        draw_text("Moving About", font, "#111111", screen, 40)
-        draw_text("PLAY (space)", font, "#111111", screen, 160)
-        draw_text("MOVE (arrows)", font, "#111111", screen, 200)
-        draw_text("SOUND (s)", font, "#111111", screen, 240)
+        screen.blit(bg_surface, bg_rect)
+        screen.blit(bg1_surface, bg1_rect)
+        draw_text("Moving About", font, "#bbbbbb", screen, 40)
+        draw_text("PLAY (space)", font, "#bbbbbb", screen, 160)
+        draw_text("MOVE (arrows)", font, "#bbbbbb", screen, 200)
+        draw_text("SOUND (s)", font, "#bbbbbb", screen, 240)
         if highscore > 0:
-            draw_text(f"HIGH SCORE: {highscore}", font, "#111111", screen, 320)
+            draw_text(f"HIGH SCORE: {highscore}", font, "#bbbbbb", screen, 320)
 
     # internal clock
     pygame.display.update()
-    print(energy_collect)
-    print(highscore)
     clock.tick(60)
