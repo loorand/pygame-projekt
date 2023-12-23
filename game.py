@@ -66,7 +66,10 @@ def game_music():
     pygame.mixer.music.stop()
     pygame.mixer.music.unload()
     pygame.mixer.music.load("audio/deserted_dunes_welcome_weary_feet.mp3")
-    pygame.mixer.music.set_volume(.7)
+    if volume == 1:
+        pygame.mixer.music.set_volume(.7)
+    else:
+        pygame.mixer.music.set_volume(0)
     pygame.mixer.music.play(-1, 0, 50)
 
 # pygame initialisation and display config (size, used fonts)
@@ -186,7 +189,7 @@ while True:
         scores()
         player_animation()
 
-        # imitating some sort of gravity
+        # imitating some sort of gravityf
         gravity += .5
         player_rect.y += gravity
         # background positioning
