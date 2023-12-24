@@ -1,5 +1,5 @@
 # Moving Into Space
-_[Github link](https://github.com/loorand/pygame-projekt/edit/georg/README.md)_  
+_[Github link](https://github.com/loorand/pygame-projekt)_  
 
 ## Sisu
 **Moving Into Space** on 2D Pygame'i mäng, kus sul tuleb aidata kosmoseujujal ellu jääda patareisid kogudes, batuutidel hüpates ja asteroide vältides. Kodukootud mängus tekitab gravitatsiooni nähtamatu must auk, millesse kukkumist tuleb kindlasti vältida.  
