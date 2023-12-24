@@ -1,17 +1,15 @@
-# pygame-projekt / 23_11_12
+# Moving Into Space
 
 ## Sisu
-**<Mängu nimi>** on 2D Pygame'i mäng, mis paneb proovile sinu refleksid ja nutikuse. **Mängus** tuleb mööda põigelda laastavatest takistustest, et aidata tegelasel? sihtkohta?. Hea õnne ja/või oskuse korral võid tee peal leida erinevaid boonuseid, mis aitavad sul jõuda kaugemale!
+**Moving Into Space** on 2D Pygame'i mäng, kus sul tuleb aidata kosmoseujujal ellu jääda patareisid kogudes, batuutidel hüpates ja asteroide vältides. Kodukootud mängus tekitab gravitatsiooni nähtamatu must auk, millesse kukkumist tuleb kindlasti vältida.
 
-## Sammud
-* **Planning**
-* **Preparation**
-* Production
-* Testing
-* Pre-launch
-* Post-production
+## Mängujuhend
+_Mängimiseks vajalik moodul PyGame tuleb installida käsuga `python3 -m pip install -U pygame --user`._
 
-## Märkused
+Mängus saad liikuda nooltega. Olles küllaltki lähedal mustale augule, on kosmoseujujale antud võime hüpata (nool üles) ja põigelda vasakule-paremale (vastav nool). Muusika lülitamiseks klahv _S_. Mängu alustamiseks _tühik_. Menüüs olles parima skoori muutmiseks _delete_.
+
+
+## Behind the scenes (november)
 
 End goal puudub, teoorias läheb lõputult edasi
 
